@@ -4,6 +4,7 @@ import {Login} from "./user/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Chat from "./components/Chat";
+import {Register} from "./user/Register";
 
 function App() {
 
@@ -11,6 +12,7 @@ function App() {
       <Routes>
           <Route path="*" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
 
           <Route

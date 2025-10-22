@@ -17,7 +17,7 @@ export default async function handler(request) {
         const client = await db.connect();
         const {rowCount, rows} = await client.sql`select * from users where username = ${username} and password = ${hashed64}`;
         if (rowCount !== 1) {
-            const error = {code: "UNAUTHORIZED", message: "Identifiant ou mot de passe incorrect"};
+            const error = {code: "UNAUTHORIZED", message: "Username ou Password incorrect"};
             return new Response(JSON.stringify(error), {
                 status: 401,
                 headers: {'content-type': 'application/json'},
