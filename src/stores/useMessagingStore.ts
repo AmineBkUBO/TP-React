@@ -38,9 +38,10 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
     fetchUsers: async () => {
         set({ loadingUsers: true });
         try {
-            const currentUserId = Number(sessionStorage.getItem("user_id"));
+            const username = sessionStorage.getItem("username");
             const data = await fetchUsersApi();
-            set({ users: data.filter(u => u.user_id !== currentUserId), loadingUsers: false });
+            console.log(data)
+            set({ users: data.filter(u => u.username !== username), loadingUsers: false });
         } catch (err) {
             console.error("Failed to fetch users", err);
             set({ loadingUsers: false });
@@ -60,7 +61,7 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
         try {
             const token = sessionStorage.getItem("token");
             const res = await fetch(`/api/messages/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authentication: `Bearer ${token}` },
             });
             const data: Message[] = await res.json();
             set({ messages: data, loadingMessages: false });

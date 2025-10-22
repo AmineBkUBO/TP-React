@@ -5,7 +5,7 @@ export async function fetchUsersApi(): Promise<User[]> {
 
     const res = await fetch("/api/users", {
         headers: {
-            Authorization: `Bearer ${token}`, // <- required
+            Authentication: `Bearer ${token}`, // <- required
         },
     });
 
