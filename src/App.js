@@ -5,17 +5,27 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Chat from "./components/Chat";
 import { Register } from "./user/Register";
-import {AppNavbar } from "./components/Navbar"; // ✅ import Navbar
+import { AppNavbar } from "./components/Navbar";
+import { MessagingApp } from "./components/MessagingApp";
+import { useEffect } from "react";
+import { useAuthStore } from "./stores/useAuthStore";
 
 function App() {
+    const restoreSession = useAuthStore((state) => state.restoreSession);
+
+    useEffect(() => {
+        restoreSession();
+    }, []);
+
     return (
         <>
-            <AppNavbar /> {/* Navbar always visible */}
+            <AppNavbar />
             <Routes>
                 <Route path="*" element={<Navigate to="/login" />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/chat" element={<Chat />} />
+                <Route path="/chatapp" element={<Chat />} />
+                <Route path="/chat" element={<MessagingApp />} />
             </Routes>
         </>
     );
