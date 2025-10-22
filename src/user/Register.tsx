@@ -1,11 +1,12 @@
 import { useAuthStore } from "../stores/useAuthStore";
-import { FormEvent } from "react";
-import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from "react-bootstrap";
-import {useNavigate} from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Container, Row, Col, Card, Form, Button, Alert, Spinner, InputGroup } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 export function Register() {
     const router = useNavigate();
     const { register, error, loading } = useAuthStore();
+    const [showPassword, setShowPassword] = useState(false); // ✅ state
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -44,7 +45,20 @@ export function Register() {
 
                                 <Form.Group className="mb-4">
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control name="password" type="password" required placeholder="Enter password" />
+                                    <InputGroup>
+                                        <Form.Control
+                                            name="password"
+                                            type={showPassword ? "text" : "password"} // ✅ toggle type
+                                            required
+                                            placeholder="Enter password"
+                                        />
+                                        <Button
+                                            variant="outline-secondary"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? "Hide" : "Show"}
+                                        </Button>
+                                    </InputGroup>
                                 </Form.Group>
 
                                 <div className="d-grid">

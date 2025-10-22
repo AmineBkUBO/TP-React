@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/useAuthStore";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import {
     Container,
     Row,
@@ -10,11 +10,13 @@ import {
     Button,
     Alert,
     Spinner,
+    InputGroup,
 } from "react-bootstrap";
 
 export function Login() {
     const navigate = useNavigate();
     const { session, error, loading, login } = useAuthStore();
+    const [showPassword, setShowPassword] = useState(false); // ✅ state
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -25,7 +27,7 @@ export function Login() {
 
         login(username, password, () => {
             form.reset();
-            navigate("/Chat");
+            navigate("/chat");
         });
     };
 
@@ -52,23 +54,27 @@ export function Login() {
 
                                 <Form.Group className="mb-4" controlId="passwordInput">
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        name="password"
-                                        type="password"
-                                        placeholder="Enter your password"
-                                        required
-                                    />
+                                    <InputGroup>
+                                        <Form.Control
+                                            name="password"
+                                            type={showPassword ? "text" : "password"} // ✅ toggle type
+                                            placeholder="Enter your password"
+                                            required
+                                        />
+                                        <Button
+                                            variant="outline-secondary"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? "Hide" : "Show"}
+                                        </Button>
+                                    </InputGroup>
                                 </Form.Group>
 
                                 <div className="d-grid">
                                     <Button variant="primary" type="submit" size="lg">
                                         {loading ? (
                                             <>
-                                                <Spinner
-                                                    animation="border"
-                                                    size="sm"
-                                                    className="me-2"
-                                                />
+                                                <Spinner animation="border" size="sm" className="me-2" />
                                                 Logging in...
                                             </>
                                         ) : (
