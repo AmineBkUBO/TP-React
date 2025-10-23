@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ isAuthenticated: true });
         } else {
             set({ isAuthenticated: false });
-            if (navigate) navigate("/login"); // redirect if no token
+            if (navigate) navigate("/login");
         }
     }
 
