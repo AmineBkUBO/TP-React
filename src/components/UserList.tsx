@@ -7,7 +7,7 @@ export function UserList() {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [fetchUsers]);
 
     if (loadingUsers) return <Spinner animation="border" />;
 
@@ -20,7 +20,8 @@ export function UserList() {
                     active={selectedUser?.user_id === user.user_id}
                     onClick={() => selectUser(user)}
                 >
-                    {user.username} <small className="text-muted">({user.last_login})</small>
+                    {user.username}{" "}
+                    <small className="text-muted">({user.last_login || "No recent activity"})</small>
                 </ListGroup.Item>
             ))}
         </ListGroup>

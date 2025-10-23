@@ -15,6 +15,17 @@ CREATE TABLE rooms (
    created_by INTEGER NOT NULL
 );
 
+CREATE TABLE messages (
+                          message_id serial PRIMARY KEY,
+                          sender_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                          receiver_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+                          room_id INTEGER REFERENCES rooms(room_id) ON DELETE CASCADE,
+                          content TEXT NOT NULL,
+                          created_on TIMESTAMP NOT NULL DEFAULT NOW(),
+                          updated_on TIMESTAMP
+);
+
+
 
 insert into users (username, password, email, created_on, external_id) values ('test', 'gcrjEewWyAuYskG3dd6gFTqsC6/SKRsbTZ+g1XHDO10=', 'test@univ-brest.fr', now(), 'ac7a25a9-bcc5-4fba-8a3d-d42acda26949');
 

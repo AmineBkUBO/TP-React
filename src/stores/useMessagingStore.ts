@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import {fetchUsersApi} from "../user/usersApi";
+import { fetchUsersApi } from "../user/usersApi";
+import { fetchMessagesApi, sendMessageApi } from "../user/messagesApi";
 
 export interface User {
     user_id: number;
@@ -25,6 +26,7 @@ interface MessagingState {
     fetchUsers: () => Promise<void>;
     selectUser: (user: User) => void;
     fetchMessages: (userId: number) => Promise<void>;
+    sendMessage: (content: string) => Promise<void>;
     addMessage: (message: Message) => void;
 }
 
@@ -35,35 +37,34 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
     loadingUsers: false,
     loadingMessages: false,
 
+    // ✅ Fetch all users except the current one
     fetchUsers: async () => {
         set({ loadingUsers: true });
         try {
             const username = sessionStorage.getItem("username");
             const data = await fetchUsersApi();
-            console.log(data)
-            set({ users: data.filter(u => u.username !== username), loadingUsers: false });
+            set({
+                users: data.filter((u) => u.username !== username),
+                loadingUsers: false,
+            });
         } catch (err) {
             console.error("Failed to fetch users", err);
             set({ loadingUsers: false });
         }
     },
 
-
+    // ✅ Select a user and fetch messages
     selectUser: (user: User) => {
         set({ selectedUser: user, messages: [] });
-        // Update URL
         window.history.pushState(null, "", `/messages/user/${user.user_id}`);
         get().fetchMessages(user.user_id);
     },
 
+    // ✅ Fetch messages for the selected user
     fetchMessages: async (userId: number) => {
         set({ loadingMessages: true });
         try {
-            const token = sessionStorage.getItem("token");
-            const res = await fetch(`/api/messages/${userId}`, {
-                headers: { Authentication: `Bearer ${token}` },
-            });
-            const data: Message[] = await res.json();
+            const data = await fetchMessagesApi(userId);
             set({ messages: data, loadingMessages: false });
         } catch (err) {
             console.error("Failed to fetch messages", err);
@@ -71,6 +72,20 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
         }
     },
 
+    // ✅ Send message and add it to UI
+    sendMessage: async (content: string) => {
+        const user = get().selectedUser;
+        if (!user) return;
+
+        try {
+            const newMsg = await sendMessageApi(user.user_id, content);
+            get().addMessage(newMsg);
+        } catch (err) {
+            console.error("Failed to send message", err);
+        }
+    },
+
+    // ✅ Add message locally
     addMessage: (message: Message) => {
         set((state) => ({ messages: [...state.messages, message] }));
     },
