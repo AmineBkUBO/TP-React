@@ -1,9 +1,19 @@
 import { useMessagingStore } from "../stores/useMessagingStore";
 import { ListGroup, Spinner } from "react-bootstrap";
+import { useRef, useEffect } from "react";
 
 export function MessageList() {
     const { messages, loadingMessages } = useMessagingStore();
     const currentUserId = Number(sessionStorage.getItem("userId"));
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     if (loadingMessages) {
         return (
@@ -21,24 +31,20 @@ export function MessageList() {
         );
     }
 
-    // Format timestamp to be more readable
     const formatTimestamp = (timestamp: string | number | Date) => {
-        const date : Date | any = new Date(timestamp);
-        const now : Date | any = new Date();
+        const date: Date | any = new Date(timestamp);
+        const now: Date | any = new Date();
         const diffInHours = (now - date) / (1000 * 60 * 60);
 
-        // If today, show time only
         if (diffInHours < 24 && date.getDate() === now.getDate()) {
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // If this week, show day and time
         if (diffInHours < 168) {
             return date.toLocaleDateString([], { weekday: 'short' }) + ' ' +
                 date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Otherwise show full date
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
             date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
@@ -81,6 +87,7 @@ export function MessageList() {
                     </ListGroup.Item>
                 );
             })}
+            <div ref={messagesEndRef} />
         </ListGroup>
     );
 }

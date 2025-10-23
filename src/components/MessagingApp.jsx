@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react"; // ⬅️ Import useRef and useEffect
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useMessagingStore } from "../stores/useMessagingStore";
 import { UserList } from "./UserList";
@@ -8,15 +8,25 @@ export function MessagingApp() {
     const { selectedUser, sendMessage } = useMessagingStore();
     const [text, setText] = useState("");
 
+    const messagesEndRef = useRef(null);
+
     const handleSend = async () => {
         if (!text.trim() || !selectedUser.user_id) return;
         await sendMessage(text);
         setText("");
     };
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [selectedUser]);
+
     return (
         <Row className="vh-100 g-0">
-            {/* Users Sidebar */}
+            {/* Users Sidebar (No Change) */}
             <Col md={3} className="border-end">
                 <div className="p-3 bg-light border-bottom">
                     <h5 className="mb-0">Users</h5>
@@ -30,7 +40,7 @@ export function MessagingApp() {
             <Col md={9} className="d-flex flex-column">
                 {selectedUser ? (
                     <>
-                        {/* Chat Header */}
+                        {/* Chat Header (No Change) */}
                         <div className="p-3 bg-white border-bottom">
                             <h5 className="mb-0">
                                 Chat with {selectedUser.username}
@@ -41,11 +51,13 @@ export function MessagingApp() {
                         <div
                             className="flex-grow-1 overflow-auto p-3 bg-light"
                             style={{ maxHeight: "calc(100vh - 130px)" }}
+                            ref={messagesEndRef} // ⬅️ Apply the ref here
                         >
                             <MessageList />
+                            {/* <div ref={messagesEndRef} /> <-- OPTION B: An empty div at the bottom */}
                         </div>
 
-                        {/* Input Form - Fixed at Bottom with spacing */}
+                        {/* Input Form (No Change) */}
                         <div className="border-top bg-white p-3 mt-auto">
                             <Form
                                 className="d-flex gap-2"

@@ -66,7 +66,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     restoreSession: (navigate?: (path: string) => void) => {
         const token = sessionStorage.getItem("token");
         if (token) {
-            set({ isAuthenticated: true });
+            set({ isAuthenticated: true });            console.info(get().isAuthenticated)
+
         } else {
             set({ isAuthenticated: false });
             if (navigate) navigate("/login");
