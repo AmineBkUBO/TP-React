@@ -106,7 +106,7 @@ export default async function handler(request) {
       `;
 
             const { rows } = await client.query(insertQuery, [sender_id, receiver_id, content]);
-            console.log("✅ Message saved:", rows[0]);
+            console.log("Message saugarde:", rows[0]);
 
             return new Response(
                 JSON.stringify(rows[0]),

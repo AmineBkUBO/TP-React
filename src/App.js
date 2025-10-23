@@ -8,19 +8,13 @@ import { AppNavbar } from "./components/Navbar";
 import { MessagingApp } from "./components/MessagingApp";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "./stores/useAuthStore";
-import {usePusher} from "./user/usePusher";
 
 function App() {
     const restoreSession = useAuthStore((state) => state.restoreSession);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const [loading, setLoading] = useState(true);
 
-    // Get user info for Pusher
-    const userId = sessionStorage.getItem("user_id");
-    const externalId = sessionStorage.getItem("external_id");
 
-    // Initialize Pusher notifications
-    usePusher(userId, externalId);
 
     useEffect(() => {
         const initAuth = async () => {

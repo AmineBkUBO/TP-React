@@ -8,11 +8,11 @@ interface AuthState {
     session: Session | null;
     error: CustomError | null;
     loading: boolean;
-    isAuthenticated: boolean; // ✅ new
+    isAuthenticated: boolean;
     login: (username: string, password: string, onSuccess?: () => void) => void;
     register: (username: string, password: string, email: string, onSuccess?: () => void) => void;
     logout: () => void;
-    restoreSession: () => void; // ✅ new, restore session from sessionStorage
+    restoreSession: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({

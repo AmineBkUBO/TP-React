@@ -22,7 +22,6 @@ CREATE TABLE messages (
                           room_id INTEGER REFERENCES rooms(room_id) ON DELETE CASCADE,
                           content TEXT NOT NULL,
                           created_on TIMESTAMP NOT NULL DEFAULT NOW(),
-                          updated_on TIMESTAMP
 );
 
 
