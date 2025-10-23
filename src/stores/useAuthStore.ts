@@ -35,18 +35,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     loading: false,
     isAuthenticated: false,
 
-    login: (username, password, onSuccess) => {
+    login: async (username, password, onSuccess) => {
         set({ loading: true, error: null });
 
-        loginUser(
+        await loginUser(
             { user_id: -1, username, password },
             (result: any) => {
                 const { token, id, username: uname, email, name } = result;
                 const userData: User = { id, username: uname, email, name };
 
-                // Store both token and user details in sessionStorage
                 sessionStorage.setItem("token", token);
                 sessionStorage.setItem("user", JSON.stringify(userData));
+                sessionStorage.setItem("userId", String(userData.id));
+                sessionStorage.setItem("username", String(userData.username));
 
                 set({
                     session: result,
