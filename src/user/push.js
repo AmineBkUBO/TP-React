@@ -18,7 +18,7 @@ export async function initBeams({ instanceId, token, userExternalId }) {
     }
 
     const beamsClient = new Client({
-        instanceId, // Your Pusher Beams instance ID
+        instanceId,
     });
 
     const tp = new TokenProvider({
