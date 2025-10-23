@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             { user_id: -1, username, password },
             (result: Session) => {
                 console.log("Login success:", result);
-                sessionStorage.setItem("userid", String(result!.id));
+                sessionStorage.setItem("userId", String(result!.id));
                 sessionStorage.setItem("token", result.token);
                 set({ session: result, error: null, loading: false, isAuthenticated: true });
                 if (onSuccess) onSuccess();
