@@ -78,6 +78,9 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
         if (!user) return;
 
         try {
+            console.info( "User : " , user);
+            console.info( "Content : " , content);
+
             const newMsg = await sendMessageApi(user.user_id, content);
             get().addMessage(newMsg);
         } catch (err) {

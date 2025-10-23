@@ -47,11 +47,6 @@ export function MessageList() {
         <ListGroup variant="flush" className="border-0">
             {messages.map((msg) => {
                 const isCurrentUser = msg.from === currentUserId;
-                console.log(msg.from)
-                console.log(currentUserId)
-                console.log("*************************")
-
-
 
                 return (
                     <ListGroup.Item

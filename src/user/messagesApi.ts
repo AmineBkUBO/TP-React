@@ -23,7 +23,7 @@ export async function fetchMessagesApi(receiver_id: number): Promise<Message[]> 
 // ✅ Send a new message
 export async function sendMessageApi(receiver_id: number, content: string): Promise<Message> {
     const token = sessionStorage.getItem("token");
-    const sender_id = Number(sessionStorage.getItem("user_id"));
+    const sender_id = Number(sessionStorage.getItem("userId"));
 
     const res = await fetch("/api/message", {
         method: "POST",

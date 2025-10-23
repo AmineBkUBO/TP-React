@@ -100,9 +100,9 @@ export default async function handler(request) {
             }
 
             const insertQuery = `
-        INSERT INTO messages (sender_id, receiver_id, content, timestamp)
+        INSERT INTO messages (sender_id, receiver_id, content, created_on)
         VALUES ($1, $2, $3, NOW())
-        RETURNING id, sender_id AS "from", receiver_id AS "to", content, timestamp
+        RETURNING message_id, sender_id AS "from", receiver_id AS "to", content, created_on
       `;
 
             const { rows } = await client.query(insertQuery, [sender_id, receiver_id, content]);
