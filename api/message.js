@@ -13,9 +13,6 @@ export default async function handler(request) {
 
         client = await db.connect();
 
-        // ===========================
-        // GET MESSAGES
-        // ===========================
         if (request.method === "GET") {
             const url = new URL(request.url);
             const receiver_id = url.searchParams.get("receiver_id");
@@ -63,9 +60,6 @@ export default async function handler(request) {
             });
         }
 
-        // ===========================
-        // POST MESSAGES
-        // ===========================
         if (request.method === "POST") {
             let body;
             try { body = await request.json(); }
@@ -83,7 +77,6 @@ export default async function handler(request) {
                 return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 403, headers: { "Content-Type": "application/json" } });
             }
 
-            // ✅ Fix: await encryptMessage
             const encryptedContent = await encryptMessage(content);
 
             const insertQuery = `
@@ -104,7 +97,6 @@ export default async function handler(request) {
                 encryptedContent
             ]);
 
-            // Return plaintext to sender
             const returnedMessage = { ...rows[0], content };
 
             return new Response(JSON.stringify(returnedMessage), {
@@ -116,7 +108,7 @@ export default async function handler(request) {
         return new Response(JSON.stringify({ message: "Method not allowed" }), { status: 405, headers: { "Content-Type": "application/json" } });
 
     } catch (error) {
-        console.error("💥 Error in /api/message:", error.message, error.stack);
+        console.error("Error in /api/message:", error.message, error.stack);
         return new Response(JSON.stringify({ message: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
     } finally {
         if (client) client.release();

@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { AppNavbar } from "./components/Navbar";
 import { Login } from "./user/Login";
 import { Register } from "./user/Register";
-import Chat from "./components/Chat";
 import { MessagingApp } from "./components/MessagingApp";
 import { useAuthStore } from "./stores/useAuthStore";
 import { initBeams } from "./user/push";
@@ -20,22 +19,19 @@ function App() {
 
     useEffect(() => {
         const initAuth = async () => {
-            // This restores the full state (token + user data)
-            restoreSession();
+            await restoreSession();
             setLoading(false);
         };
         initAuth();
     }, [restoreSession]);
 
-    // ✅ Initialize Pusher Beams when user logs in
-    // This now correctly runs because the 'user' object is restored on reload
     useEffect(() => {
         if (isAuthenticated && user) {
             initBeams(user.id, user.name || user.email)
-                .then(() => console.log("✅ Beams initialized for user:", user.id))
-                .catch((err) => console.error("❌ Beams init error:", err));
+                .then(() => console.log("Beams initialized for user:", user.id))
+                .catch((err) => console.error("Beams init error:", err));
         }
-    }, [isAuthenticated, user]); // Added 'user' to the dependency array if it was missing
+    }, [isAuthenticated, user]);
 
     if (loading) {
         return <div className="text-center mt-5">Loading...</div>;
