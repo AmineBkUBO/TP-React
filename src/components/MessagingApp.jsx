@@ -98,7 +98,7 @@ export function MessagingApp() {
                                 }}
                             >
                                 <Form.Control
-                                    placeholder="Type a message..."
+                                    placeholder="Type a message... | Your messages are securely encrypted in our database"
                                     value={text}
                                     onChange={(e) => setText(e.target.value)}
                                     onKeyDown={(e) => {

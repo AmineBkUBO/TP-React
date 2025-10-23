@@ -1,6 +1,7 @@
 import { useMessagingStore } from "../stores/useMessagingStore";
 import { ListGroup, Spinner } from "react-bootstrap";
 import { useRef, useEffect } from "react";
+import { ShieldLock } from "react-bootstrap-icons"; // ✅ add a small security icon
 
 export function MessageList() {
     const { messages, loadingMessages } = useMessagingStore();
@@ -32,21 +33,27 @@ export function MessageList() {
     }
 
     const formatTimestamp = (timestamp: string | number | Date) => {
-        const date: Date | any = new Date(timestamp);
-        const now: Date | any = new Date();
+        const date: any = new Date(timestamp);
+        const now: any = new Date();
         const diffInHours = (now - date) / (1000 * 60 * 60);
 
         if (diffInHours < 24 && date.getDate() === now.getDate()) {
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         }
 
         if (diffInHours < 168) {
-            return date.toLocaleDateString([], { weekday: 'short' }) + ' ' +
-                date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return (
+                date.toLocaleDateString([], { weekday: "short" }) +
+                " " +
+                date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+            );
         }
 
-        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
-            date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return (
+            date.toLocaleDateString([], { month: "short", day: "numeric" }) +
+            " " +
+            date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        );
     };
 
     return (
@@ -64,9 +71,7 @@ export function MessageList() {
                     >
                         <div
                             className={`p-3 rounded-3 shadow-sm ${
-                                isCurrentUser
-                                    ? "bg-primary text-white"
-                                    : "bg-light text-dark border"
+                                isCurrentUser ? "bg-primary text-white" : "bg-light text-dark border"
                             }`}
                             style={{
                                 maxWidth: "70%",
@@ -87,6 +92,13 @@ export function MessageList() {
                     </ListGroup.Item>
                 );
             })}
+
+            {/* ✅ Encryption notice */}
+            <div className="text-center text-muted small mt-3 mb-2 d-flex justify-content-center align-items-center gap-1">
+                <ShieldLock size={14} className="text-secondary" />
+                <span>Your messages are securely encrypted in our database</span>
+            </div>
+
             <div ref={messagesEndRef} />
         </ListGroup>
     );
