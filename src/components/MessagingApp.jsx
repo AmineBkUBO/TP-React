@@ -1,13 +1,12 @@
-import { useState, useRef, useEffect } from "react"; // ⬅️ Import useRef and useEffect
+import { useState, useRef, useEffect } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useMessagingStore } from "../stores/useMessagingStore";
 import { UserList } from "./UserList";
 import { MessageList } from "./MessageList";
 
 export function MessagingApp() {
-    const { selectedUser, sendMessage } = useMessagingStore();
+    const { selectedUser, sendMessage, refreshMessages } = useMessagingStore();
     const [text, setText] = useState("");
-
     const messagesEndRef = useRef(null);
 
     const handleSend = async () => {
@@ -20,13 +19,25 @@ export function MessagingApp() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // Scroll on user change
     useEffect(() => {
         scrollToBottom();
     }, [selectedUser]);
 
+    // ✅ Listen for Push Notifications (from Service Worker)
+    useEffect(() => {
+        const handlePush = (event) => {
+            console.log("📨 New push notification received:", event.detail);
+            refreshMessages?.(); // Auto-refresh messages list
+        };
+
+        window.addEventListener("push-notification", handlePush);
+        return () => window.removeEventListener("push-notification", handlePush);
+    }, [refreshMessages]);
+
     return (
         <Row className="vh-100 g-0">
-            {/* Users Sidebar (No Change) */}
+            {/* Sidebar */}
             <Col md={3} className="border-end">
                 <div className="p-3 bg-light border-bottom">
                     <h5 className="mb-0">Users</h5>
@@ -36,28 +47,24 @@ export function MessagingApp() {
                 </div>
             </Col>
 
-            {/* Chat Area */}
+            {/* Chat area */}
             <Col md={9} className="d-flex flex-column">
                 {selectedUser ? (
                     <>
-                        {/* Chat Header (No Change) */}
                         <div className="p-3 bg-white border-bottom">
                             <h5 className="mb-0">
                                 Chat with {selectedUser.username}
                             </h5>
                         </div>
 
-                        {/* Messages Area */}
                         <div
                             className="flex-grow-1 overflow-auto p-3 bg-light"
                             style={{ maxHeight: "calc(100vh - 130px)" }}
-                            ref={messagesEndRef} // ⬅️ Apply the ref here
+                            ref={messagesEndRef}
                         >
                             <MessageList />
-                            {/* <div ref={messagesEndRef} /> <-- OPTION B: An empty div at the bottom */}
                         </div>
 
-                        {/* Input Form (No Change) */}
                         <div className="border-top bg-white p-3 mt-auto">
                             <Form
                                 className="d-flex gap-2"

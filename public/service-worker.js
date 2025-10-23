@@ -1,25 +1,27 @@
-// proper initialization
-if( 'function' === typeof importScripts) {
-  /* eslint-disable no-undef */
-  importScripts("https://js.pusher.com/beams/service-worker.js");
-}
+self.addEventListener('push', function (event) {
+    if (!event.data) return;
 
-PusherPushNotifications.onNotificationReceived = ({
-  pushEvent,
-  payload,
-  handleNotification,
-}) => {
+    const data = event.data.json();
 
-  console.log("worker got : " + JSON.stringify(payload));
+    // Exemple de structure de la notification
+    const title = data.title || 'Nouveau message';
+    const options = {
+        body: data.body || '',
+        icon: '/icon.png', // optionnel
+        data: data, // pour le transmettre au client
+    };
 
-  // Get the client.
-  self.clients.matchAll().then((matchedClient) => matchedClient.forEach(client => {
-    client.postMessage(payload.data);
-  }));
+    // Affiche la notification
+    event.waitUntil(self.registration.showNotification(title, options));
 
-  // Your custom notification handling logic here 🛠️
-  // This method triggers the default notification handling logic offered by
-  // the Beams SDK. This gives you an opportunity to modify the payload.
-  // E.g. payload.notification.title = "A client-determined title!"
-  pushEvent.waitUntil(handleNotification(payload));
-};
+    // Notifie l'application React en cours
+    self.clients.matchAll({ includeUncontrolled: true, type: 'window' })
+        .then((clients) => {
+            clients.forEach((client) => {
+                client.postMessage({
+                    type: 'PUSH_NOTIFICATION',
+                    payload: data,
+                });
+            });
+        });
+});

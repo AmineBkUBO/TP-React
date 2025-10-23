@@ -24,7 +24,7 @@ export function usePusher(userId: string | null, externalId: string | null) {
 
                 // Initialize Pusher Beams client
                 const beamsClient = new PusherPushNotifications.Client({
-                    instanceId: process.env.REACT_APP_PUSHER_INSTANCE_ID || '',
+                    instanceId: process.env.PUSHER_INSTANCE_ID || '',
                 });
 
                 beamsClientRef.current = beamsClient;
