@@ -1,41 +1,33 @@
-import { Client, TokenProvider } from '@pusher/push-notifications-web';
+import * as PusherPushNotifications from '@pusher/push-notifications-web';
 
-export async function initBeams({ instanceId, token, userExternalId }) {
-    if (!('Notification' in window)) {
-        console.warn('This browser does not support notifications');
-        return null;
+const BEAMS_INSTANCE_ID = "84ae2afe-b806-4865-9a0b-939025ffdfe3";
+let beamsClient = null;
+
+export async function initBeams(userId, userName) {
+    if (!BEAMS_INSTANCE_ID) throw new Error("Instance ID is required");
+
+    if (!beamsClient) {
+        beamsClient = new PusherPushNotifications.Client({
+            instanceId: BEAMS_INSTANCE_ID
+        });
     }
-
-    try {
-        const permission = await window.Notification.requestPermission();
-        if (permission !== 'granted') {
-            console.warn('Notification permission not granted:', permission);
-            return null;
-        }
-    } catch (err) {
-        console.error('Notification permission error:', err);
-        return null;
-    }
-
-    const beamsClient = new Client({
-        instanceId,
-    });
-
-    const tp = new TokenProvider({
-        url: `/api/beams?user_id=${encodeURIComponent(userExternalId)}`,
-        headers: { Authorization: `Bearer ${token}` },
-    });
 
     try {
         await beamsClient.start();
-        await beamsClient.addDeviceInterest('global');
-        await beamsClient.setUserId(String(userExternalId), tp);
 
-        const deviceId = await beamsClient.getDeviceId();
-        console.log('✅ Beams started. Device ID:', deviceId);
-        return beamsClient;
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        await beamsClient.addDeviceInterest(`user-${userId}`);
     } catch (err) {
-        console.error('❌ Beams init error:', err);
-        return null;
+        console.error("Beams initialization failed:", err);
+
+        beamsClient = null;
+        throw err;
     }
+
+    return beamsClient;
+}
+
+export function getBeamsClient() {
+    return beamsClient;
 }

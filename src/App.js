@@ -11,12 +11,12 @@ import { useAuthStore } from "./stores/useAuthStore";
 import { initBeams } from "./user/push";
 
 function App() {
-    // Access the restored 'user' object from the updated store
     const restoreSession = useAuthStore((state) => state.restoreSession);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const user = useAuthStore((state) => state.user);
     const [loading, setLoading] = useState(true);
 
+    // Restore user session
     useEffect(() => {
         const initAuth = async () => {
             await restoreSession();
@@ -24,6 +24,8 @@ function App() {
         };
         initAuth();
     }, [restoreSession]);
+
+
 
     useEffect(() => {
         if (isAuthenticated && user) {
@@ -33,6 +35,7 @@ function App() {
         }
     }, [isAuthenticated, user]);
 
+
     if (loading) {
         return <div className="text-center mt-5">Loading...</div>;
     }
@@ -41,10 +44,10 @@ function App() {
         <>
             <AppNavbar />
             <Routes>
-                <Route path="/login" element={ <Login />} />
-                <Route path="/register" element={ <Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/chat" element={isAuthenticated ? <MessagingApp /> : <Navigate to="/login" />} />
-                <Route path="*" element={ <Login/> } />
+                <Route path="*" element={<Login />} />
             </Routes>
         </>
     );
