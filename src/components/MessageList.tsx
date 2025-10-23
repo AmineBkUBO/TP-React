@@ -1,7 +1,7 @@
 import { useMessagingStore } from "../stores/useMessagingStore";
 import { ListGroup, Spinner } from "react-bootstrap";
 import { useRef, useEffect } from "react";
-import { ShieldLock } from "react-bootstrap-icons"; // ✅ add a small security icon
+import { ShieldLock } from "react-bootstrap-icons";
 
 export function MessageList() {
     const { messages, loadingMessages } = useMessagingStore();
@@ -56,6 +56,16 @@ export function MessageList() {
         );
     };
 
+    // ✅ Detect if a string is an image URL
+    const isImageUrl = (text: string) => {
+        try {
+            const url = new URL(text);
+            return url.pathname.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i);
+        } catch {
+            return false;
+        }
+    };
+
     return (
         <ListGroup variant="flush" className="border-0">
             {messages.map((msg) => {
@@ -79,7 +89,22 @@ export function MessageList() {
                                 wordBreak: "break-word",
                             }}
                         >
-                            <div className="mb-1">{msg.content}</div>
+                            <div className="mb-1">
+                                {isImageUrl(msg.content) ? (
+                                    <img
+                                        src={msg.content}
+                                        alt="sent media"
+                                        style={{
+                                            maxWidth: "100%",
+                                            borderRadius: "8px",
+                                            display: "block",
+                                            marginTop: "5px",
+                                        }}
+                                    />
+                                ) : (
+                                    msg.content
+                                )}
+                            </div>
                             <div
                                 className={`small ${
                                     isCurrentUser ? "text-white-50" : "text-muted"

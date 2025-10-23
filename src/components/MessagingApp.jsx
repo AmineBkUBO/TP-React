@@ -4,16 +4,17 @@ import { useMessagingStore } from "../stores/useMessagingStore";
 import { UserList } from "./UserList";
 import { MessageList } from "./MessageList";
 import { ChatPlaceholder } from "./ChatPlaceholder";
+import { upload } from "@vercel/blob/client";
 
 export function MessagingApp() {
     const { selectedUser, selectedRoom, sendMessage, refreshMessages } = useMessagingStore();
     const [text, setText] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const fileRef = useRef(null);
     const messagesEndRef = useRef(null);
 
-    // ✅ UNIFIED CHAT LOGIC: True if EITHER a user OR a room is selected.
     const activeChat = selectedUser || selectedRoom;
 
-    // Determine the chat header title dynamically
     const chatTitle = selectedUser
         ? `Chat with ${selectedUser.username}`
         : selectedRoom
@@ -21,37 +22,49 @@ export function MessagingApp() {
             : "Select a user or room";
 
     const handleSend = async () => {
-        // Send message only if text is not empty and an active chat exists.
         if (!text.trim() || !activeChat) return;
-
-        // Assuming sendMessage handles whether it's a user or room message based on the store state.
         await sendMessage(text);
         setText("");
     };
 
+    const handleImageUpload = async () => {
+        if (!fileRef.current?.files?.length) return;
+        const file = fileRef.current.files[0];
+        setUploading(true);
+
+        try {
+            // Upload image to Vercel Blob
+            const blob = await upload(file.name, file, {
+                access: "public",
+                handleUploadUrl: "http://localhost:3000/api/MediaUpload",
+            });
+
+            // Send the uploaded image URL as a message
+            await sendMessage(blob.url);
+        } catch (err) {
+            console.error("Image upload failed:", err);
+            alert("Image upload failed! Check console.");
+        } finally {
+            setUploading(false);
+            fileRef.current.value = null; // Reset file input
+        }
+    };
+
     const scrollToBottom = () => {
-        // Scrolls the empty <div> at the end of the message list into view.
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    // ✅ FIXED useEffect: Scroll on user OR room change
     useEffect(() => {
-        // Use a slight delay to ensure messages are rendered before attempting to scroll.
-        const timer = setTimeout(() => {
-            scrollToBottom();
-        }, 100);
-
+        const timer = setTimeout(scrollToBottom, 100);
         return () => clearTimeout(timer);
-    }, [selectedUser, selectedRoom]); // DEPENDENCY ARRAY now includes selectedRoom
+    }, [selectedUser, selectedRoom]);
 
-    // ✅ Listen for Push Notifications (from Service Worker)
     useEffect(() => {
         const handlePush = (event) => {
             console.log("📨 New push notification received:", event.detail);
-            refreshMessages?.(); // Auto-refresh messages list
-            scrollToBottom(); // Also scroll to bottom on new message
+            refreshMessages?.();
+            scrollToBottom();
         };
-
         window.addEventListener("push-notification", handlePush);
         return () => window.removeEventListener("push-notification", handlePush);
     }, [refreshMessages]);
@@ -77,14 +90,9 @@ export function MessagingApp() {
                             <h5 className="mb-0">{chatTitle}</h5>
                         </div>
 
-                        {/* Message List (Scrollable Area) */}
-                        <div
-                            className="flex-grow-1 overflow-auto p-3 bg-light"
-                            style={{ maxHeight: "calc(100vh - 130px)" }}
-                            // The ref is moved INSIDE this container to an empty div
-                        >
+                        {/* Message List */}
+                        <div className="flex-grow-1 overflow-auto p-3 bg-light" style={{ maxHeight: "calc(100vh - 130px)" }}>
                             <MessageList />
-                            {/* Scroll target placed at the end of the content */}
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -108,6 +116,23 @@ export function MessagingApp() {
                                         }
                                     }}
                                 />
+
+                                {/* Image Upload Input */}
+                                <input
+                                    type="file"
+                                    ref={fileRef}
+                                    style={{ display: "none" }}
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                />
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => fileRef.current?.click()}
+                                    disabled={uploading}
+                                >
+                                    {uploading ? "Uploading..." : "Media"}
+                                </Button>
+
                                 <Button
                                     type="submit"
                                     variant="primary"
