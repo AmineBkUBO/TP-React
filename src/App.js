@@ -9,6 +9,7 @@ import { Register } from "./user/Register";
 import { MessagingApp } from "./components/MessagingApp";
 import { useAuthStore } from "./stores/useAuthStore";
 import { initBeams } from "./user/push";
+import AvatarUploadPage from "./components/MediaUpload";
 
 function App() {
     const restoreSession = useAuthStore((state) => state.restoreSession);
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/chat" element={isAuthenticated ? <MessagingApp /> : <Navigate to="/login" />} />
                 <Route path="*" element={<Login />} />
+                <Route path="/upload" element={<AvatarUploadPage/> } />
             </Routes>
         </>
     );
