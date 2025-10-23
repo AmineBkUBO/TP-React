@@ -42,11 +42,11 @@ function App() {
         <>
             <AppNavbar />
             <Routes>
-                <Route path="/login" element={isAuthenticated ? <Navigate to="/chat" /> : <Login />} />
-                <Route path="/register" element={isAuthenticated ? <Navigate to="/chat" /> : <Register />} />
+                <Route path="/login" element={ <Login />} />
+                <Route path="/register" element={ <Register />} />
                 <Route path="/chatapp" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />
                 <Route path="/chat" element={isAuthenticated ? <MessagingApp /> : <Navigate to="/login" />} />
-                <Route path="*" element={<Navigate to={isAuthenticated ? "/chat" : "/login"} />} />
+                <Route path="*" element={ <Login/> } />
             </Routes>
         </>
     );

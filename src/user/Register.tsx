@@ -18,7 +18,7 @@ export function Register() {
 
         register(username, password, email, () => {
             form.reset();
-            router("/chat");
+            router("/login");
         });
     };
 
