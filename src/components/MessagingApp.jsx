@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Row, Col, Form, Button } from "react-bootstrap";
+import { Row, Col, Form, Button, Badge } from "react-bootstrap";
 import { useMessagingStore } from "../stores/useMessagingStore";
 import { UserList } from "./UserList";
 import { MessageList } from "./MessageList";
 import { ChatPlaceholder } from "./ChatPlaceholder";
 import { upload } from "@vercel/blob/client";
+import { Image, Send } from "react-bootstrap-icons";
 
 export function MessagingApp() {
     const { selectedUser, selectedRoom, sendMessage, refreshMessages } = useMessagingStore();
@@ -16,10 +17,16 @@ export function MessagingApp() {
     const activeChat = selectedUser || selectedRoom;
 
     const chatTitle = selectedUser
-        ? `Chat with ${selectedUser.username}`
+        ? selectedUser.username
         : selectedRoom
-            ? `Chat In ${selectedRoom.name}`
+            ? selectedRoom.name
             : "Select a user or room";
+
+    const chatSubtitle = selectedUser
+        ? "Direct Message"
+        : selectedRoom
+            ? "Group Chat"
+            : "";
 
     const handleSend = async () => {
         if (!text.trim() || !activeChat) return;
@@ -33,20 +40,18 @@ export function MessagingApp() {
         setUploading(true);
 
         try {
-            // Upload image to Vercel Blob
             const blob = await upload(file.name, file, {
                 access: "public",
                 handleUploadUrl: "http://localhost:3000/api/MediaUpload",
             });
 
-            // Send the uploaded image URL as a message
             await sendMessage(blob.url);
         } catch (err) {
             console.error("Image upload failed:", err);
             alert("Image upload failed! Check console.");
         } finally {
             setUploading(false);
-            fileRef.current.value = null; // Reset file input
+            fileRef.current.value = null;
         }
     };
 
@@ -72,9 +77,9 @@ export function MessagingApp() {
     return (
         <Row className="vh-100 g-0">
             {/* Sidebar */}
-            <Col md={3} className="border-end">
-                <div className="p-3 bg-light border-bottom">
-                    <h5 className="mb-0">Users/Rooms</h5>
+            <Col md={3} className="border-end bg-light">
+                <div className="p-3 bg-white border-bottom shadow-sm">
+                    <h5 className="mb-0 fw-semibold">Conversations</h5>
                 </div>
                 <div className="overflow-auto" style={{ height: "calc(100vh - 57px)" }}>
                     <UserList />
@@ -86,27 +91,46 @@ export function MessagingApp() {
                 {activeChat ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-3 bg-white border-bottom">
-                            <h5 className="mb-0">{chatTitle}</h5>
+                        <div className="p-3 bg-white border-bottom shadow-sm">
+                            <div className="d-flex align-items-center">
+                                <div
+                                    className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white me-3"
+                                    style={{ width: '40px', height: '40px', fontSize: '1.1rem', fontWeight: '600' }}
+                                >
+                                    {chatTitle.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h6 className="mb-0 fw-semibold">{chatTitle}</h6>
+                                    <small className="text-muted">
+                                        {chatSubtitle}
+                                        {selectedRoom && <Badge bg="secondary" className="ms-2">Room</Badge>}
+                                    </small>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Message List */}
-                        <div className="flex-grow-1 overflow-auto p-3 bg-light" style={{ maxHeight: "calc(100vh - 130px)" }}>
+                        <div className="flex-grow-1 overflow-auto p-3" style={{
+                            maxHeight: "calc(100vh - 130px)",
+                            backgroundColor: "#f8f9fa"
+                        }}>
                             <MessageList />
                             <div ref={messagesEndRef} />
                         </div>
 
                         {/* Message Input Form */}
-                        <div className="border-top bg-white p-3 mt-auto">
+                        <div className="border-top bg-white p-3 shadow-sm">
                             <Form
-                                className="d-flex gap-2"
+                                className="d-flex gap-2 align-items-end"
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     handleSend();
                                 }}
                             >
                                 <Form.Control
-                                    placeholder="Type a message... | Your messages are securely encrypted in our database"
+                                    as="textarea"
+                                    rows={1}
+                                    placeholder="Type your message..."
                                     value={text}
                                     onChange={(e) => setText(e.target.value)}
                                     onKeyDown={(e) => {
@@ -115,9 +139,14 @@ export function MessagingApp() {
                                             handleSend();
                                         }
                                     }}
+                                    style={{
+                                        resize: 'none',
+                                        minHeight: '40px',
+                                        maxHeight: '120px'
+                                    }}
+                                    className="rounded-pill"
                                 />
 
-                                {/* Image Upload Input */}
                                 <input
                                     type="file"
                                     ref={fileRef}
@@ -125,21 +154,27 @@ export function MessagingApp() {
                                     accept="image/*"
                                     onChange={handleImageUpload}
                                 />
+
                                 <Button
-                                    variant="secondary"
+                                    variant="outline-secondary"
                                     onClick={() => fileRef.current?.click()}
                                     disabled={uploading}
+                                    className="rounded-circle d-flex align-items-center justify-content-center"
+                                    style={{ width: '40px', height: '40px', padding: '0' }}
+                                    title={uploading ? "Uploading..." : "Attach image"}
                                 >
-                                    {uploading ? "Uploading..." : "Media"}
+                                    <Image size={18} />
                                 </Button>
 
                                 <Button
                                     type="submit"
                                     variant="primary"
                                     disabled={!text.trim()}
-                                    style={{ minWidth: "80px" }}
+                                    className="rounded-circle d-flex align-items-center justify-content-center"
+                                    style={{ width: '40px', height: '40px', padding: '0' }}
+                                    title="Send message"
                                 >
-                                    Send
+                                    <Send size={18} />
                                 </Button>
                             </Form>
                         </div>
